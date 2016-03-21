@@ -6,13 +6,20 @@ var router = express.Router();
 var Keep = require('../models/keep.js');
 
 router.get('/', function(req, res) {
-    res.json({message: "You've hit the Keep route"});
+    Keep.find({}, function(err, keeps){
+        if(err){
+            res.status(500).json({message: "Unable to Find Users", error: err});
+        } else {
+            res.json(keeps);
+        }
+    })
 });
 
 router.post('/', function(req, res){
     var keep = new Keep({
         date: new Date(),
-        content: "This is a test Keep"
+        content: "This is a test Keep",
+        foo: "test"
     });
     keep.save(function(err){
         if(err){

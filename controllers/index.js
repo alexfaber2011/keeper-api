@@ -4,6 +4,7 @@
 var express = require('express');
 var router = express.Router();
 
-router.use('/keeps', require('./keepCtrl.js'));
+router.use('/api/v1/keeps', require('./keepCtrl.js'));
+router.use('/api/v1/auth', require('./authCtrl.js'));
 
 module.exports = router;
