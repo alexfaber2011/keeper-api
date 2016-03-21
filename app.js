@@ -9,14 +9,15 @@ var jwt = require('jsonwebtoken');
 var morgan = require('morgan');
 
 var config = require('./config');
+var authentication = require('./middlewares/authentication');
 
 //Parse when application/json
 app.use(bodyParser.json());
 app.use(expressValidator());
-
 app.use(morgan('dev'));
 
 //Add all controllers to our app
+app.use(authentication.verify);
 app.use(require('./controllers'));
 
 app.listen(3000, function() {

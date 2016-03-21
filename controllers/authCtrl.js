@@ -19,7 +19,6 @@ router.post('/signup', function(req, res, next){
     }
 
     var user = new User({
-        userName: req.body.userName,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
@@ -70,7 +69,7 @@ router.post('/token', function(req, res, next){
             });
             return
         }
-        jwt.sign(user, config.secret,{expiresInMinutes: 1440}, function(token){
+        jwt.sign(user, config.secret,{expiresIn: 86400}, function(token){
             res.json({success: true, token: token});
         });
 
