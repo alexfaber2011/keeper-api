@@ -3,6 +3,7 @@
  */
 var express = require('express');
 var router = express.Router();
+var validator = require('../utilities/validator');
 var Keep = require('../models/keep.js');
 
 router.get('/', function(req, res) {
@@ -16,16 +17,39 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res){
-    var keep = new Keep({
-        date: new Date(),
-        content: "This is a test Keep",
-        foo: "test"
-    });
+    req.checkBody('date', 'date is required and must be a valid date').isDate();
+    req.checkBody('content', 'content is required and must be a valid date').optional().isAscii();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+    if(!validator.isArrayOfTags(req.body.tags)){
+        res.status(400).json({message: "field tags, must be a valid array of tags"});
+        return
+    }
+    if(!validator.isArrayOfObjectIds(req.body.people)){
+        res.status(400).json({message: "field people, must be an array of objectIds"});
+        return
+    }
+    var user = req.decoded;
+    var newKeep = {
+        userId: user._id,
+        date: new Date(req.body.date),
+        content: req.body.content
+    };
+    if(req.body.tags){
+        newKeep.tags = req.body.tags;
+    }
+    if(req.body.people){
+        newKeep.people = req.body.people;
+    }
+    var keep = new Keep(newKeep);
     keep.save(function(err){
         if(err){
-            res.status(500).json({message: "Unable to Add user", error: err});
+            res.status(500).json({message: "Unable to Add Keep", error: err});
         } else {
-            res.json({message: "Successfully Added User to DB"});
+            res.json(keep);
         }
     });
 });

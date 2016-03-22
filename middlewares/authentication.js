@@ -17,10 +17,10 @@ module.exports.verify = function(req, res, next){
     }
     jwt.verify(token, config.secret, function(err, decoded){
         if(err){
-            res.status({success: false, message: "Failed to authenticate token"});
+            res.status(403).json({success: false, message: "Failed to authenticate token"});
             return
         }
-        req.decoded = decoded;
+        req.decoded = decoded._doc;
         next();
     });
 };
