@@ -3,6 +3,7 @@
  */
 var express = require('express');
 var router = express.Router();
+var _ = require('underscore');
 var validator = require('../utilities/validator');
 var Keep = require('../models/keep.js');
 
@@ -48,7 +49,28 @@ router.post('/', function(req, res){
 //READ - ALL
 router.get('/', function(req, res) {
     var user = req.decoded;
-    Keep.find({userId: user._id}, function(err, keeps){
+    req.checkQuery('fromDate', 'must be a valid date').optional().isDate();
+    req.checkQuery('toDate', 'must be a valid date').optional().isDate();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+    var q = {userId: user._id};
+    var dateQuery = {};
+    var mutated = false;
+    if(req.query.fromDate){
+        dateQuery = _.extend(dateQuery, {$gte: new Date(req.query.fromDate)});
+        mutated = true;
+    }
+    if(req.query.toDate){
+        dateQuery = _.extend(dateQuery, {$lte: new Date(req.query.toDate)});
+        mutated = true;
+    }
+    if(mutated){
+        q.date = dateQuery;
+    }
+    Keep.find(q, function(err, keeps){
         if(err){
             res.status(500).json({message: "Unable to find Keeps", error: err});
         } else {
