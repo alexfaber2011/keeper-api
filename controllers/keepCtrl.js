@@ -6,19 +6,10 @@ var router = express.Router();
 var validator = require('../utilities/validator');
 var Keep = require('../models/keep.js');
 
-router.get('/', function(req, res) {
-    Keep.find({}, function(err, keeps){
-        if(err){
-            res.status(500).json({message: "Unable to Find Users", error: err});
-        } else {
-            res.json(keeps);
-        }
-    })
-});
-
+//CREATE
 router.post('/', function(req, res){
-    req.checkBody('date', 'date is required and must be a valid date').isDate();
-    req.checkBody('content', 'content is required and must be a valid date').optional().isAscii();
+    req.checkBody('date', 'required and must be a valid date').isDate();
+    req.checkBody('content', 'required').isAscii();
     var errors = req.validationErrors();
     if(errors){
         res.status(400).json({message: "There were validation errors", errors: errors});
@@ -52,6 +43,18 @@ router.post('/', function(req, res){
             res.json(keep);
         }
     });
+});
+
+//READ - ALL
+router.get('/', function(req, res) {
+    var user = req.decoded;
+    Keep.find({userId: user._id}, function(err, keeps){
+        if(err){
+            res.status(500).json({message: "Unable to find Keeps", error: err});
+        } else {
+            res.json(keeps);
+        }
+    })
 });
 
 module.exports = router;
