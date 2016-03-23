@@ -119,4 +119,27 @@ router.put('/:id', function(req, res){
     })
 });
 
+//DELETE - base
+router.delete('/:id', function(req, res){
+    var user = req.decoded;
+    req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+
+    Keep.findOneAndRemove({_id: req.params.id, userId: user._id}, function(err, keep){
+        if(err){
+            res.status(500).json({message: "Unable to delete keep: " + req.params.id});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find Keep with id of: " + req.params.id});
+            return
+        }
+        res.json(keep);
+    });
+});
+
 module.exports = router;
