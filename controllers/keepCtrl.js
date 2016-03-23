@@ -7,7 +7,7 @@ var _ = require('underscore');
 var validator = require('../utilities/validator');
 var Keep = require('../models/keep.js');
 
-//CREATE
+//CREATE - base
 router.post('/', function(req, res){
     req.checkBody('date', 'required and must be a valid date').isDate();
     req.checkBody('content', 'required').isAscii();
