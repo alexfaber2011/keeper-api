@@ -80,7 +80,7 @@ router.get('/', function(req, res) {
     })
 });
 
-//UPDATE
+//UPDATE - base
 router.put('/:id', function(req, res){
     var user = req.decoded;
     req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
@@ -106,7 +106,7 @@ router.put('/:id', function(req, res){
         res.status(400).json({message: "Must supply either a new date or new content"})
         return
     }
-    Keep.findByIdAndUpdate(req.params.id, {$set: q}, {new: true}, function(err, keep){
+    Keep.findOneAndUpdate({_id: req.params.id, userId: user._id}, {$set: q}, {new: true}, function(err, keep){
         if(err){
             res.status(500).json({message: "Unable to update keep: " + req.params.id});
             return
