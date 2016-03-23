@@ -56,6 +56,7 @@ router.get('/', function(req, res) {
         res.status(400).json({message: "There were validation errors", errors: errors});
         return
     }
+
     var q = {userId: user._id};
     var dateQuery = {};
     var mutated = false;
@@ -76,6 +77,45 @@ router.get('/', function(req, res) {
         } else {
             res.json(keeps);
         }
+    })
+});
+
+//UPDATE
+router.put('/:id', function(req, res){
+    var user = req.decoded;
+    req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    req.checkBody('content', 'must be Ascii').optional().isAscii();
+    req.checkBody('date', 'must be a valid date').optional().isDate();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+
+    var q = {};
+    var mutated = false;
+    if(req.body.content){
+        q = _.extend(q, {content: req.body.content});
+        mutated = true;
+    }
+    if(req.body.date){
+        q = _.extend(q, {date: new Date(req.body.date)});
+        mutated = true;
+    }
+    if(!mutated){
+        res.status(400).json({message: "Must supply either a new date or new content"})
+        return
+    }
+    Keep.findByIdAndUpdate(req.params.id, {$set: q}, {new: true}, function(err, keep){
+        if(err){
+            res.status(500).json({message: "Unable to update keep: " + req.params.id});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find Keep with id of: " + req.params.id});
+            return
+        }
+        res.json(keep);
     })
 });
 
