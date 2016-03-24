@@ -5,18 +5,17 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
-var jwt = require('jsonwebtoken');
 var morgan = require('morgan');
 
-var config = require('./config');
 var authentication = require('./middlewares/authentication');
+var expressValidatorOptions = require('./utilities/expressValidatorOptions');
 
 //Parse when application/json
 app.use(bodyParser.json());
-app.use(expressValidator());
+app.use(expressValidator(expressValidatorOptions));
 app.use(morgan('dev'));
 
-//Add all controllers to our app
+//Add all controllers to our app with some authentication middleware
 app.use(authentication.verify);
 app.use(require('./controllers'));
 
