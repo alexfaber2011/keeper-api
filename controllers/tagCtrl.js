@@ -57,6 +57,28 @@ router.get('/', function(req, res) {
     })
 });
 
+router.get('/:id', function(req, res){
+    var user = req.decoded;
+    req.checkParams('id', 'required, and must be a valid Mongo ObjectID').isMongoId();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+
+    Tag.findOne({_id: req.params.id, userId: user._id}, function(err, tag){
+        if(err){
+            res.status(500).json({message: "Unable to find tag: " + req.params.id});
+            return
+        }
+        if(!tag){
+            res.status(404).json({message: "Unable to find Tag with id of: " + req.params.id});
+            return
+        }
+        res.json(tag);
+    })
+});
+
 //UPDATE
 router.put('/:id', function(req, res){
     var user = req.decoded;
