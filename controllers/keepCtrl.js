@@ -119,6 +119,54 @@ router.put('/:id', function(req, res){
     })
 });
 
+//UPDATE - add/update tag to Keep
+router.put('/:id/tags', function(req, res){
+    req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    req.checkBody('tagId', 'required, must be a valid Mongo ObjectID').isMongoId();
+    req.checkBody('description', 'required, must be ascii').isAscii();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+
+    var user = req.decoded;
+    //check to make sure
+    Keep.findOne({_id: req.params.id, userId: user._id}, function(err, keep){
+        if(err){
+            res.status(500).json({message: "Unable to find keep", error: err});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find keep with id of: " + req.params.id});
+            return
+        }
+        var tag = _.find(keep.tags, function(t){
+            return t._id = req.body.tagId;
+        });
+        //If tag already exists, then update it.
+        if(tag){
+            tag.description = req.body.description;
+            keep.tags = _.reject(keep.tags, function(t){
+                return t._id = tag._id;
+            });
+            keep.tags.push(tag);
+        } else {
+            keep.tags.push({
+                tagId: req.body.tagId,
+                description: req.body.description
+            });
+        }
+        keep.save(function(err){
+            if(err){
+                res.status(500).json({message: "Unable to save updated keep", error: err});
+                return
+            }
+            res.json(keep);
+        });
+    });
+});
+
 //DELETE - base
 router.delete('/:id', function(req, res){
     var user = req.decoded;
@@ -136,6 +184,34 @@ router.delete('/:id', function(req, res){
         }
         if(!keep){
             res.status(404).json({message: "Unable to find Keep with id of: " + req.params.id});
+            return
+        }
+        res.json(keep);
+    });
+});
+
+//DELETE - tag
+router.delete('/:id/tag/:tagId', function(req, res){
+    var user = req.decoded;
+    req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    req.checkParams('tagId', 'required, and must be valid Mongo ObjectID').isMongoId();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+    var query = {
+        _id:  req.params.id,
+        userId: user._id,
+        'tags._id': req.params.tagId
+    };
+    Keep.findOneAndUpdate(query, {$pull: {tags: {_id: req.params.tagId}}}, {new: true}, function(err, keep){
+        if(err){
+            res.status(500).json({message: "Unable to delete keep tag", error: err});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find Keep with id of: " + req.params.id + " and tagId of: " + req.params.tagId});
             return
         }
         res.json(keep);

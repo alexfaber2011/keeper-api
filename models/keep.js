@@ -20,7 +20,7 @@ var keepSchema = new Schema({
     },
     tags: [{
         tagId: Schema.Types.ObjectId,
-        content: String
+        description: String
     }],
     people: [Schema.Types.ObjectId]
 });
