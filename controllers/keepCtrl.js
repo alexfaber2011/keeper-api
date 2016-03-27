@@ -119,6 +119,35 @@ router.put('/:id', function(req, res){
     })
 });
 
+//UPDATE - add people to a Keep
+router.put('/:id/people', function(req, res){
+    req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+    if(!validator.isArrayOfObjectIds(req.body.people)){
+        res.status(400).json({message: "field people, must be an array of objectIds"});
+        return
+    }
+
+    var user = req.decoded;
+    var query = {_id: req.params.id, userId: user._id};
+    var updateQuery = {$addToSet: {people: {$each: req.body.people}}};
+    Keep.findOneAndUpdate(query, updateQuery, {new: true}, function(err, keep){
+        if(err){
+            res.status(500).json({message: "Unable to find keep", error: err});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find keep with id of: " + req.params.id});
+            return
+        }
+        res.json(keep);
+    });
+});
+
 //UPDATE - add/update tag to Keep
 router.put('/:id/tags', function(req, res){
     req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
@@ -184,6 +213,35 @@ router.delete('/:id', function(req, res){
         }
         if(!keep){
             res.status(404).json({message: "Unable to find Keep with id of: " + req.params.id});
+            return
+        }
+        res.json(keep);
+    });
+});
+
+//DELETE - remove people from a Keep
+router.delete('/:id/people', function(req, res){
+    req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+    if(!validator.isArrayOfObjectIds(req.body.people)){
+        res.status(400).json({message: "field people, must be an array of objectIds"});
+        return
+    }
+
+    var user = req.decoded;
+    var query = {_id: req.params.id, userId: user._id};
+    var updateQuery = {$pull: {people: {$in: req.body.people}}};
+    Keep.findOneAndUpdate(query, updateQuery, {new: true}, function(err, keep){
+        if(err){
+            res.status(500).json({message: "Unable to find keep", error: err});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find keep with id of: " + req.params.id});
             return
         }
         res.json(keep);
