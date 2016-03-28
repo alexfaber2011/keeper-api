@@ -4,7 +4,6 @@
 var express = require('express');
 var router = express.Router();
 var _ = require('underscore');
-var validator = require('../utilities/validator');
 var Tag = require('../models/tag.js');
 
 //CREATE

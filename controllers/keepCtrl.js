@@ -4,24 +4,17 @@
 var express = require('express');
 var router = express.Router();
 var _ = require('underscore');
-var validator = require('../utilities/validator');
 var Keep = require('../models/keep.js');
 
 //CREATE - base
 router.post('/', function(req, res){
     req.checkBody('date', 'required and must be a valid date').isDate();
+    req.checkBody('tags', 'must be an array of tags').optional().isArrayOfTags();
+    req.checkBody('people', 'must be an array of valid ObjectIds').optional().isArrayOfObjectIds();
     req.checkBody('content', 'required').isAscii();
     var errors = req.validationErrors();
     if(errors){
         res.status(400).json({message: "There were validation errors", errors: errors});
-        return
-    }
-    if(!validator.isArrayOfTags(req.body.tags)){
-        res.status(400).json({message: "field tags, must be a valid array of tags"});
-        return
-    }
-    if(!validator.isArrayOfObjectIds(req.body.people)){
-        res.status(400).json({message: "field people, must be an array of objectIds"});
         return
     }
     var user = req.decoded;
@@ -122,16 +115,12 @@ router.put('/:id', function(req, res){
 //UPDATE - add people to a Keep
 router.put('/:id/people', function(req, res){
     req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    req.checkBody('people', 'required, and must be an array of valid ObjectIds').isArrayOfObjectIds();
     var errors = req.validationErrors();
     if(errors){
         res.status(400).json({message: "There were validation errors", errors: errors});
         return
     }
-    if(!validator.isArrayOfObjectIds(req.body.people)){
-        res.status(400).json({message: "field people, must be an array of objectIds"});
-        return
-    }
-
     var user = req.decoded;
     var query = {_id: req.params.id, userId: user._id};
     var updateQuery = {$addToSet: {people: {$each: req.body.people}}};
@@ -222,13 +211,10 @@ router.delete('/:id', function(req, res){
 //DELETE - remove people from a Keep
 router.delete('/:id/people', function(req, res){
     req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
+    req.checkBody('people', 'required, and must be an array of valid ObjectIds').isArrayOfObjectIds();
     var errors = req.validationErrors();
     if(errors){
         res.status(400).json({message: "There were validation errors", errors: errors});
-        return
-    }
-    if(!validator.isArrayOfObjectIds(req.body.people)){
-        res.status(400).json({message: "field people, must be an array of objectIds"});
         return
     }
 
