@@ -73,6 +73,28 @@ router.get('/', function(req, res) {
     })
 });
 
+router.get('/:id', function(req, res) {
+    var user = req.decoded;
+    req.checkParams('id', 'required, must be a valid Mongo ObjectId').isMongoId();
+    var errors = req.validationErrors();
+    if(errors){
+        res.status(400).json({message: "There were validation errors", errors: errors});
+        return
+    }
+
+    Keep.findOne({_id: req.params.id, userId: user._id}, function(err, keep){
+        if(err) {
+            res.status(500).json({message: "Unable to find Keep", error: err});
+            return
+        }
+        if(!keep){
+            res.status(404).json({message: "Unable to find Keep by id of: "  + req.params.id, error: err})
+            return
+        }
+        res.json(keep);
+    })
+});
+
 //UPDATE - base
 router.put('/:id', function(req, res){
     var user = req.decoded;
