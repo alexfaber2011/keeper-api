@@ -44,6 +44,7 @@ router.get('/', function(req, res) {
     var user = req.decoded;
     req.checkQuery('fromDate', 'must be a valid date').optional().isDate();
     req.checkQuery('toDate', 'must be a valid date').optional().isDate();
+    req.checkQuery('sort', 'must be a sort query: date, -date').optional().isValidSortQuery();
     var errors = req.validationErrors();
     if(errors){
         res.status(400).json({message: "There were validation errors", errors: errors});
@@ -64,7 +65,8 @@ router.get('/', function(req, res) {
     if(mutated){
         q.date = dateQuery;
     }
-    Keep.find(q, function(err, keeps){
+    req.sanitizeQuery('sort').toSortQuery();
+    Keep.find(q).sort(req.query.sort).exec(function(err, keeps){
         if(err){
             res.status(500).json({message: "Unable to find Keeps", error: err});
         } else {
