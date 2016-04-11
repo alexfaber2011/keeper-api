@@ -555,7 +555,7 @@ describe('/keeps/:id/tags', function(){
     });
     it('should allow Alex to remove paintingTag from Keep', function(done){
         request(app)
-            .delete(apiContext + '/keeps/' + keepId + '/tag/' + tagInstance)
+            .delete(apiContext + '/keeps/' + keepId + '/tags/' + tagInstance)
             .set('x-access-token', alexToken)
             .end(function(err, res){
                 handleError(err);

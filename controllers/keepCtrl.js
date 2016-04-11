@@ -259,7 +259,7 @@ router.delete('/:id/people', function(req, res){
 });
 
 //DELETE - tag
-router.delete('/:id/tag/:tagId', function(req, res){
+router.delete('/:id/tags/:tagId', function(req, res){
     var user = req.decoded;
     req.checkParams('id', 'required, and must be valid Mongo ObjectID').isMongoId();
     req.checkParams('tagId', 'required, and must be valid Mongo ObjectID').isMongoId();
