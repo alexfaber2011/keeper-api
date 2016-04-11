@@ -11,11 +11,12 @@ var personSchema = new Schema({
     },
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     dateMet: Date,
     description: String
 });
+
+personSchema.index({name: 1, userId: 1}, { unique: true });
 
 module.exports = mongoose.model('Person', personSchema);

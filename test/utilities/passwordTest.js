@@ -15,7 +15,7 @@ describe('Password Utility', function(){
                     done();
                 })
                 .catch(function(err){
-                    assert(false, "Received and Error when we shouldn't have.")
+                    assert(false, "Received and Error when we shouldn't have.");
                     done();
                 });
         });
@@ -28,7 +28,7 @@ describe('Password Utility', function(){
                     done()
                 })
                 .catch(function(res){
-                    assert(res, 'compare should have succeeded')
+                    assert(res, 'compare should have succeeded');
                     done();
                 });
         });

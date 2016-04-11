@@ -34,7 +34,6 @@ router.post('/signup', function(req, res, next){
                 } else if(err){
                     res.status(500).json({message: "Unable to create user", error: err});
                 } else {
-                    console.log("cooL");
                     res.json({message: "Success"});
                 }
             });

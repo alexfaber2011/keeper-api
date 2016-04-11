@@ -5,7 +5,6 @@ var jwt = require('jsonwebtoken');
 var config = require('../config');
 
 module.exports.verify = function(req, res, next){
-    console.log(req.originalUrl);
     if(req.originalUrl == '/api/v1/auth/token' || req.originalUrl == '/api/v1/auth/signup'){
         return next();
     }

@@ -11,8 +11,7 @@ var tagSchema = new Schema({
     },
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     description: {
         type: String,
@@ -20,5 +19,8 @@ var tagSchema = new Schema({
     },
     color: String
 });
+
+tagSchema.index({ name: 1, userId: 1}, { unique: true });
+
 
 module.exports = mongoose.model('Tag', tagSchema);

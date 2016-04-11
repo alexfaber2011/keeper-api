@@ -4,12 +4,15 @@
 var mongoose = require('mongoose');
 var config = require('./config');
 
+var createMongoLabUri = function(id, port, dbName, user, password){
+    return 'mongodb://' + user + ':' + password + '@' + id + '.mlab.com:' + port + '/' + dbName;
+};
+
+
 if (process.env.NODE_ENV == 'development') {
-    mongoose.connect('mongodb://localhost/keeper-api');
+    mongoose.connect(createMongoLabUri('ds019950', 19950, 'clotho-dev-api', config.db.dev.user, config.db.dev.password))
 } else {
-    var uri = 'mongodb://ds025439.mlab.com:25439/keeper-api';
-    var options = {user: config.db.user, pass: config.db.password};
-    mongoose.connect(uri, options);
+    mongoose.connect(createMongoLabUri('ds019970', 19970, 'clotho-api', config.db.prod.user, config.db.prod.password));
 }
 
 module.exports = mongoose;

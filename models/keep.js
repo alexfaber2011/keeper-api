@@ -11,8 +11,7 @@ var keepSchema = new Schema({
     },
     date: {
         type: Date,
-        required: true,
-        unique: true
+        required: true
     },
     content: {
         type: String,
@@ -24,5 +23,7 @@ var keepSchema = new Schema({
     }],
     people: [Schema.Types.ObjectId]
 });
+
+keepSchema.index({ date: 1, userId: 1}, { unique: true });
 
 module.exports = mongoose.model('Keep', keepSchema);

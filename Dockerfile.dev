@@ -1,0 +1,10 @@
+FROM node:4.4.2
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Set its environment to development
+ENV NODE_ENV development
+
+EXPOSE 3000
