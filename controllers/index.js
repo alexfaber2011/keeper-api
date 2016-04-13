@@ -4,6 +4,7 @@
 var express = require('express');
 var router = express.Router();
 
+router.use('/api/v1/', require('./statusCtrl'));
 router.use('/api/v1/auth', require('./authCtrl'));
 router.use('/api/v1/keeps', require('./keepCtrl'));
 router.use('/api/v1/tags', require('./tagCtrl'));
