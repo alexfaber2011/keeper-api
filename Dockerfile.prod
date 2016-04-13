@@ -1,17 +1,6 @@
 FROM node:4.4.2-onbuild
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+EXPOSE 80
+EXPOSE 443
 
-# Install app dependencies
-COPY package.json /usr/src/app/
-RUN npm install
-RUN npm install nodemon -g
-
-# Bundle app source
-COPY . /usr/src/app
-
-EXPOSE 3000
-CMD [ "npm",  "test" ]
 CMD [ "npm", "start" ]
